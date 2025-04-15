@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The Keystone token validator plugin is a custom plugin for APISIX that validates tokens sent in the `X-Auth-Token` header by calling the Keystone service. Upon successful validation, it sends the identity information in a configurable header (defaulting to `X-Identity`) to the backend.
+The Keystone token validator plugin is a custom plugin for APISIX that validates tokens sent in a configurable header (defaulting to `X-Auth-Token`) by calling the Keystone service. Upon successful validation, it sends the identity information in a configurable header (defaulting to `X-Identity`) to the backend.
 
 ## Plugin Configuration Options
 
@@ -10,7 +10,9 @@ The plugin requires the following configuration parameters:
 
 * `keystone_endpoint`: The URL of the Keystone service. (Required)
 * `timeout`: The timeout in milliseconds for the request to Keystone. (Optional, default: 5000)
-* `header_name`: The name of the header that will contain the identity information. (Optional, default: `X-Identity`)
+* `auth_header_name`: The name of the header of incoming request that will contain the token. (Optional, default: `X-Auth-Token`)
+
+* `identity_header_name`: The name of the header to be inserted that will contain the identity information. (Optional, default: `X-Identity`)
 
 ## Deployment Steps
 
@@ -31,4 +33,4 @@ The plugin requires the following configuration parameters:
 
 After deploying the plugin, you can use it in the APISIX Dashboard like other plugins. Configure the plugin with your Keystone endpoint and other optional parameters as needed.
 
-When a request is made with a valid `X-Auth-Token` header, the plugin will validate the token with Keystone and forward the identity information in the configured header to the backend.
+When a request is made with a valid auth_header_name (`X-Auth-Token`) header, the plugin will validate the token with Keystone and forward the identity information in the configured header to the backend.

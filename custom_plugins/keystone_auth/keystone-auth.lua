@@ -14,7 +14,11 @@ local schema = {
                type = 'integer',
                default = 5000,
           },
-          header_name = {
+          auth_header_name = {
+               type = 'string',
+               default = "X-Auth-Token",
+          },
+          identity_header_name = {
                type = 'string',
                default = "X-Identity",
           },
@@ -77,12 +81,13 @@ end
 
 -- Main access function for the plugin
 function _M.access(conf, ctx)
-    -- Extract the X-Auth-Token from the request headers
+    -- Extract the conf.auth_header_name from the request headers
     local headers = ngx.req.get_headers()
-    local token = headers['X-Auth-Token']
+    local auth_header_name = conf.auth_header_name
+    local token = headers[auth_header_name]
     if not token then
-        ngx.log(ngx.ERR, 'Missing X-Auth-Token header')
-        return core.response.exit(403, { message = 'Missing X-Auth-Token header' })
+        ngx.log(ngx.ERR, 'Missing ' .. auth_header_name .. ' header')
+        return core.response.exit(403, { message = 'Missing ' .. auth_header_name .. ' header' })
     end
 
     -- Validate the token
@@ -96,10 +101,10 @@ function _M.access(conf, ctx)
     local token_info_b64 = ngx.encode_base64(token_info_json)
 
     -- Set the X-Identity-Info header for the upstream request
-    local header_name = conf.header_name
-    ngx.req.set_header(header_name, token_info_b64)
+    local identity_header_name = conf.identity_header_name
+    ngx.req.set_header(identity_header_name, token_info_b64)
     
-    ngx.log(ngx.INFO, 'Successfully validated token and set ' .. header_name .. ' header')
+    ngx.log(ngx.INFO, 'Successfully validated token and set ' .. identity_header_name .. ' header')
 end
 
 return _M
